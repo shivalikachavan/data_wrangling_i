@@ -5,6 +5,8 @@ output: html_document
 
 ```{r}
 library(tidyverse)
+library(readxl)
+library(haven)
 ```
 
 Lte's import a data set. 
@@ -55,6 +57,35 @@ pups_df =
     )
 pups_df = 
   janitor::clean_names(pups_df)
+```
+
+## Excel imports?
+csvs are great but excel files also exist (boo)
+```{r}
+mlb_df = 
+  read_excel("data/mlb11.xlsx")
+```
+
+And when the data set is stored in an unorderly fashion use range
+```{r}
+fotr_df = 
+  read_excel("data/LotR_Words.xlsx", range = "B3:D6")
+```
+
+
+## SAS??
+Import pulse data set
+```{r}
+pulse_df = 
+  read_sas("data/public_pulse_data.sas7bdat")
+pulse_df = 
+  janitor::clean_names(pulse_df)
+```
+
+## Why we don't use read.csv
+```{r, eval = FALSE}
+litters_df_base = 
+  read.csv("data/FAS_litters.csv")
 ```
 
  

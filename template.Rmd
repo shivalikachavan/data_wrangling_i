@@ -34,4 +34,27 @@ Skimming data can be nice
 skimr::skim(litters_df)
 ```
 
+## Fix the missingness
+```{r}
+litters_df = 
+  read_csv(
+    "data/FAS_litters.csv", 
+    na = c("NA", ".", "")
+    )
+litters_df = 
+  janitor::clean_names(litters_df)
+```
+
+Import pups and skip first 3 empty rows
+```{r}
+pups_df = 
+  read_csv(
+    "data/FAS_pups.csv", 
+    na = c("NA", ".", ""), 
+    skip = 3
+    )
+pups_df = 
+  janitor::clean_names(pups_df)
+```
+
  

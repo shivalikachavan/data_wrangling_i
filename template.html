@@ -595,6 +595,41 @@ display: none;
 </tr>
 </tbody>
 </table>
+<div id="fix-the-missingness" class="section level2">
+<h2>Fix the missingness</h2>
+<pre class="r"><code>litters_df = 
+  read_csv(
+    &quot;data/FAS_litters.csv&quot;, 
+    na = c(&quot;NA&quot;, &quot;.&quot;, &quot;&quot;)
+    )</code></pre>
+<pre><code>## Rows: 49 Columns: 8
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr (2): Group, Litter Number
+## dbl (6): GD0 weight, GD18 weight, GD of Birth, Pups born alive, Pups dead @ ...
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>litters_df = 
+  janitor::clean_names(litters_df)</code></pre>
+<p>Import pups and skip first 3 empty rows</p>
+<pre class="r"><code>pups_df = 
+  read_csv(
+    &quot;data/FAS_pups.csv&quot;, 
+    na = c(&quot;NA&quot;, &quot;.&quot;, &quot;&quot;), 
+    skip = 3
+    )</code></pre>
+<pre><code>## Rows: 313 Columns: 6
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr (1): Litter Number
+## dbl (5): Sex, PD ears, PD eyes, PD pivot, PD walk
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>pups_df = 
+  janitor::clean_names(pups_df)</code></pre>
+</div>
 
 
 

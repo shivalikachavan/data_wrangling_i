@@ -1,21 +1,37 @@
 ---
-title: "Simple document"
+title: "Data Import"
 output: html_document
 ---
 
-I'm an R Markdown document! 
-
-# Section 1
-
-Here's a **code chunk** that samples from 
-a _normal distribution_:
-
 ```{r}
-samp = rnorm(100)
-length(samp)
+library(tidyverse)
 ```
 
-# Section 2
+Lte's import a data set. 
+```{r}
+litters_df = 
+  read_csv("data/FAS_litters.csv")
+```
 
-I can take the mean of the sample, too!
-The mean is `r mean(samp)`.
+Look at your data. 
+```{r}
+names(litters_df)
+```
+
+Update names in litters_df
+```{r}
+litters_df = 
+  janitor::clean_names(litters_df)
+```
+
+Look at data again (lol)
+```{r}
+litters_df
+```
+
+Skimming data can be nice
+```{r}
+skimr::skim(litters_df)
+```
+
+ 

@@ -5,26 +5,144 @@ date: "2025-09-18"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r, message = FALSE}
+library(tidyverse)
+litters_df = 
+  read_csv(
+    "./data/FAS_litters.csv", 
+    na = c("NA", ".", "")
+    )
+litters_df = 
+  janitor::clean_names(litters_df)
+pups_df = 
+  read_csv(
+    "./data/FAS_pups.csv", 
+    na = c("NA", ".", ""), 
+    skip = 3
+    )
+pups_df = 
+  janitor::clean_names(pups_df)
 ```
 
-## R Markdown
+## Select 
+```{r collapse=TRUE}
+select(litters_df, group, litter_number, gd0_weight, pups_born_alive)
+select(litters_df, group:gd_of_birth)
+select(litters_df, -pups_survive)
+select(litters_df, GROUP = group, LiTtEr_NuMbEr = litter_number)
+select(litters_df, starts_with("gd"))
+select(litters_df, ends_with("birth"))
+select(litters_df, contains("pups"))
+select(litters_df, litter_number, pups_survive, everything()) #moves litter_number and pups to front of selection
+relocate(litters_df, litter_number, pups_survive) #similar to everything()
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+# Learning Assessment
+select(pups_df, litter_number, sex, pd_ears)
 ```
 
-## Including Plots
+## Filter 
+```{r collapse=TRUE}
+filter(litters_df, gd_of_birth == 20)
+filter(litters_df, pups_born_alive >= 2) # all litters have 3+ pups born alive
+filter(litters_df, pups_survive != 4)
+filter(litters_df, !(pups_survive == 4)) # same as line above
+filter(litters_df, group %in% c("Con7", "Con8")) #useful for sets
+filter(litters_df, group == "Con7" & gd_of_birth == 20)
+```
+It's common to omit missing observations. use `drop_na` for this from the `tidyr` package. 
+```{r collapse=TRUE}
+drop_na(litters_df) # drop rows with any value missing
+# Learning Assessment
 
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+filter(pups_df, sex == 1)
+filter(pups_df, sex == 2, pd_walk < 11)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+## Mutate
+```{r collapse=TRUE}
+mutate(litters_df,
+  wt_gain = gd18_weight - gd0_weight,
+  group = str_to_lower(group)
+)
+
+#Learning Assessment
+mutate(
+  pups_df, 
+  pd_pivot_sub_7 = pd_pivot - 7,
+  pd_sum = pd_ears + pd_eyes + pd_pivot + pd_pivot_sub_7 + pd_walk
+  )
+```
+
+## Arrange
+```{r collapse=TRUE}
+head(arrange(litters_df, group, pups_born_alive), 10)
+```
+
+## />
+super clunky options
+```{r collapse=TRUE}
+litters_df_raw = 
+    read_csv("./data/FAS_litters.csv", na = c("NA", ".", ""))
+litters_df_clean_names = janitor::clean_names(litters_df_raw)
+litters_df_selected_cols = select(litters_df_clean_names, -pups_survive)
+litters_df_with_vars = 
+  mutate(
+    litters_df_selected_cols, 
+    wt_gain = gd18_weight - gd0_weight,
+    group = str_to_lower(group))
+litters_df_with_vars_without_missing = 
+  drop_na(litters_df_with_vars, wt_gain)
+litters_df_with_vars_without_missing
+```
+
+less clunky second option
+```{r collapse=TRUE}
+litters_df_clean = 
+  drop_na(
+    mutate(
+      select(
+        janitor::clean_names(
+          read_csv("./data/FAS_litters.csv", na = c("NA", ".", ""))
+          ), 
+      -pups_survive
+      ),
+    wt_gain = gd18_weight - gd0_weight,
+    group = str_to_lower(group)
+    ),
+  wt_gain
+  )
+litters_df_clean
+```
+
+Both give the same output but the code is not easy to read at all
+Yay for piping!!! We <3 piping
+```{r collapse=TRUE}
+litters_df = 
+  read_csv("./data/FAS_litters.csv", na = c("NA", ".", "")) |> 
+  janitor::clean_names() |> 
+  select(-pups_survive) |> 
+  mutate(
+    wt_gain = gd18_weight - gd0_weight,
+    group = str_to_lower(group)) |> 
+  drop_na(wt_gain)
+litters_df
+```
+
+Sometime you have to tell the data where to go in the pipe (never really needed in `tidyverse`)
+```{r collapse=TRUE}
+litters_df |>
+  lm(wt_gain ~ pups_born_alive, data = _) |>
+  broom::tidy()
+
+# Learning Assessment
+pups_df_LA =
+  read_csv("./data/FAS_pups.csv", na = c("NA", ".", ""), skip = 3) |> 
+  janitor::clean_names() |> 
+  filter(sex == 1) |> 
+  select(-pd_ears) |> 
+  mutate(pd_pivot_more_than_7 = pd_pivot > 7)
+pups_df_LA 
+```
+
+
+

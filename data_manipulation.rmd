@@ -2,7 +2,7 @@
 title: "data_manipulation"
 author: "Shivalika Chavan"
 date: "2025-09-18"
-output: html_document
+output: github_document
 ---
 
 ```{r, message = FALSE}
